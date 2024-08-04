@@ -26,11 +26,12 @@
       }
       #unity-canvas {
         width: 100%;
-        height: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
       }
       .unity-desktop #unity-canvas {
-        width: 1920px;
-        height: 1080px;
+        max-width: 100%;
+        max-height: 100%;
       }
       .unity-mobile #unity-canvas {
         width: 100%;
@@ -117,6 +118,13 @@
         // performance, uncomment the following line:
         // config.devicePixelRatio = 1;
 
+        // Enable sound on user interaction
+        document.addEventListener('touchstart', () => {
+          if (unityInstance) {
+            unityInstance.SendMessage('GameObjectName', 'MethodName', 'Parameters');
+          }
+        }, { once: true });
+
       } else {
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
 
@@ -130,15 +138,21 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-              }).then((unityInstance) => {
-                loadingBar.style.display = "none";
-                fullscreenButton.onclick = () => {
-                  unityInstance.SetFullscreen(1);
-                };
-              }).catch((message) => {
-                alert(message);
-              });
-            };
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
+          fullscreenButton.onclick = () => {
+            unityInstance.SetFullscreen(1);
+          };
+          // Enable sound on user interaction for desktop
+          document.addEventListener('click', () => {
+            if (unityInstance) {
+              unityInstance.SendMessage('GameObjectName', 'MethodName', 'Parameters');
+            }
+          }, { once: true });
+        }).catch((message) => {
+          alert(message);
+        });
+      };
 
       document.body.appendChild(script);
 
